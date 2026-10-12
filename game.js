@@ -119,3 +119,6 @@ for(const s of shots){ctx.strokeStyle='#fff2b5';ctx.lineWidth=3;ctx.beginPath();
 function resize(){const r=canvas.getBoundingClientRect();canvas.width=Math.round(r.width*Math.min(devicePixelRatio||1,2));canvas.height=Math.round(r.height*Math.min(devicePixelRatio||1,2));}window.addEventListener('resize',resize);window.addEventListener('convoy-layout',resize);resize();updateUI();function frame(t){const dt=Math.min((t-last)/1000,.05);last=t;if(!window.ConvoyMobile?.blocked)step(dt);window.ConvoyAudio?.tick(state,level,enemies.some(e=>e.boss&&e.hp>0),document.hidden||window.ConvoyMobile?.blocked);if(state!=='paused')for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=260*dt;}particles=particles.filter(p=>p.life>0);draw();requestAnimationFrame(frame);}assetsReady.then(()=>requestAnimationFrame(frame));
 // Compact diagnostic snapshot for verification.
 window.convoySnapshot=()=>({state,coins,cars,weapon,hp,maxhp,level,wave,kills,enemies:enemies.length,loaded:Object.keys(art)});
+
+// Music keeps its clock while visual assets are still loading on cellular connections.
+if(typeof setInterval==='function')setInterval(()=>window.ConvoyAudio?.tick(state,level,enemies.some(e=>e.boss&&e.hp>0),document.hidden||window.ConvoyMobile?.blocked),100);
