@@ -1,0 +1,18 @@
+{
+  "name": "Crazy Cats: Convoy",
+  "short_name": "Crazy Cats",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#111a17",
+  "theme_color": "#111a17",
+  "icons": [
+    {
+      "src": "assets/calico.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
