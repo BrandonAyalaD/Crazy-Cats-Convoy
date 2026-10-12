@@ -56,6 +56,7 @@ function restart(){replacementSlots=0;moduleLossNotice=0;battleRetreat=0;bossEnt
 $('reset').onclick=()=>{if(confirm('¿Comenzar desde cero? Se reemplazará el progreso de esta expedición.'))restart();};
 async function activateGameAudio(enable){const on=await window.ConvoyAudio.toggle(enable);muted=!on;$('sound').textContent='Sonido: '+(on?'ON':'OFF');$('sound').setAttribute?.('aria-pressed',String(on));if(on)sfx('upgrade');}
 $('sound').onclick=()=>{audioUserSet=true;activateGameAudio(muted);};
+$('audio-test').onclick=async()=>{const ok=await window.ConvoyAudio.test();if(ok){muted=false;audioUserSet=true;$('sound').textContent='Sonido: ON';$('audio-test-result').textContent='Tono de prueba iniciado.';}else $('audio-test-result').textContent='Safari no activó el audio. Toca Probar sonido otra vez.';};
 function updateVolumes(){window.ConvoyAudio?.volumes(Number($('fx-volume').value)/100,Number($('music-volume').value)/100);}
 $('fx-volume').oninput=updateVolumes;$('music-volume').oninput=updateVolumes;
 function updateAudioChannels(){window.ConvoyAudio?.channels($('enable-fx').checked,$('enable-music').checked,$('enable-rats').checked);}
