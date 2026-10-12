@@ -21,7 +21,11 @@ if(beat%16===0){bowed(root,step*15,.019,when);bowed(root*Math.pow(2,7/12),step*1
 if(position<24&&(beat%4===0||hasBoss&&beat%2===0)){const semitones=[0,7,3,10,1,7,5,3];const semitone=semitones[(Math.floor(beat/2)+zone)%8];bowed(root*2*Math.pow(2,semitone/12),step*(hasBoss?1.5:2.3),hasBoss?.016:.012,when,true);}
 if(beat%8===0){note(72,27,.3,.10,'sine',music,when);note(55,30,.19,.045,'sine',music,when+.21);}if(beat%16===10)hiss(.28,.027,420,'bandpass',music,when);
 if(hasBoss&&beat%8===4){note(90,24,.45,.13,'sine',music,when);hiss(.24,.045,650,'bandpass',music,when);}if(beat%32===22){bowed(root*4*Math.pow(2,(bar%2?13:11)/12),step*5,.008,when,true);}beat++;}
-async function toggle(on){enabled=on;try{if(on){boot();await ac.resume();await Promise.all([loadBossVoice(),loadBruteAttack(),loadCreatureVoices()]);nextBeat=ac.currentTime+.03;master.gain.setTargetAtTime(.65,ac.currentTime,.04);}else if(ac){master.gain.setTargetAtTime(0,ac.currentTime,.02);await ac.suspend();}}catch{enabled=false;}return enabled;}
+function unlockAudio(){boot();const source=ac.createBufferSource();source.buffer=ac.createBuffer(1,1,ac.sampleRate);source.connect(ac.destination);source.onended=()=>source.disconnect();source.start();return ac.resume();}
+async function recover(){if(enabled&&ac&&ac.state!=='running'){try{await unlockAudio();}catch{}}}
+async function toggle(on){enabled=on;try{if(on){await unlockAudio();nextBeat=ac.currentTime+.03;master.gain.setTargetAtTime(.65,ac.currentTime,.04);void Promise.all([loadBossVoice(),loadBruteAttack(),loadCreatureVoices()]).catch(()=>{});}else if(ac){master.gain.setTargetAtTime(0,ac.currentTime,.02);await ac.suspend();}}catch{enabled=false;}return enabled&&ac?.state==='running';}
+// Retry interrupted mobile audio on the next real touch; do not wait for MP3 downloads.
+if(typeof document!=='undefined'){document.addEventListener('pointerdown',()=>{void recover();},{passive:true});document.addEventListener('touchend',()=>{void recover();},{passive:true});document.addEventListener('visibilitychange',()=>{if(!document.hidden)void recover();});}
 function volumes(effects,background){fxVolume=effects;musicVolume=background;if(fx)fx.gain.setTargetAtTime(effectsEnabled?effects:0,ac.currentTime,.03);if(music)music.gain.setTargetAtTime(musicEnabled?background:0,ac.currentTime,.03);}
 function channels(effects,background,rats){effectsEnabled=effects;musicEnabled=background;ratsEnabled=rats;if(ratBus)ratBus.gain.setTargetAtTime(rats?1:0,ac.currentTime,.03);volumes(fxVolume,musicVolume);}
-return{play,tick,toggle,volumes,channels};})();
+return{play,tick,toggle,volumes,channels,recover};})();
