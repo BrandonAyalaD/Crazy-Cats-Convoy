@@ -33,4 +33,6 @@ if(typeof document!=='undefined'){document.addEventListener('pointerdown',()=>{v
 function volumes(effects,background){fxVolume=effects;musicVolume=background;if(fx)fx.gain.setTargetAtTime(effectsEnabled?effects:0,ac.currentTime,.03);if(music)music.gain.setTargetAtTime(musicEnabled?background:0,ac.currentTime,.03);}
 function channels(effects,background,rats){effectsEnabled=effects;musicEnabled=background;ratsEnabled=rats;if(ratBus)ratBus.gain.setTargetAtTime(rats?1:0,ac.currentTime,.03);volumes(fxVolume,musicVolume);}
 async function test(){const ready=await toggle(true);if(!ready)return false;configureSession();note(523.25,523.25,.24,.08,'sine',ac.destination,ac.currentTime+.01);note(659.25,659.25,.24,.08,'sine',ac.destination,ac.currentTime+.3);return true;}
-return{play,tick,toggle,volumes,channels,recover,test};})();
+let acidGain;
+function acidBurn(active){if(!ac||!enabled)return;if(active&&!acidGain){const source=ac.createBufferSource(),filter=ac.createBiquadFilter();acidGain=ac.createGain();source.buffer=noise;source.loop=true;filter.type='bandpass';filter.frequency.value=1800;filter.Q.value=.7;acidGain.gain.value=0;source.connect(filter);filter.connect(acidGain);acidGain.connect(ratBus);source.start();}if(acidGain)acidGain.gain.setTargetAtTime(active?.14:0,ac.currentTime,.04);}
+return{play,tick,toggle,volumes,channels,recover,test,acidBurn};})();
